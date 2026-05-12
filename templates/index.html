@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgriSense AI – Potato Leaf Disease Detection</title>
+  <meta name="description" content="AI-powered potato leaf disease detection using deep learning. Upload a leaf image to instantly diagnose Early Blight, Late Blight, or Healthy status with treatment recommendations." />
+  <meta name="keywords" content="potato disease detection, AI agriculture, leaf disease, plant health, deep learning" />
+  <meta property="og:title" content="AgriSense AI – Potato Disease Detector" />
+  <meta property="og:description" content="Instantly detect potato leaf diseases with AI" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Phosphor Icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1/src/index.js" defer></script>
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+
+<body>
+
+  <!-- ───────────── ANIMATED BACKGROUND ───────────── -->
+  <div class="bg-canvas" aria-hidden="true">
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+    <div class="grid-lines"></div>
+  </div>
+
+  <!-- ───────────── NAVBAR ───────────── -->
+  <nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
+    <div class="nav-container">
+      <a class="nav-brand" href="/" aria-label="AgriSense AI Home">
+        <div class="brand-icon" aria-hidden="true">
+          <i class="ph ph-plant"></i>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">AgriSense</span>
+          <span class="brand-badge">AI</span>
+        </div>
+      </a>
+
+      <div class="nav-links" id="navLinks" role="menubar">
+        <a href="#upload-section" class="nav-link" role="menuitem">Analyze</a>
+        <a href="#about-section" class="nav-link" role="menuitem">About</a>
+        <a href="#history-section" class="nav-link" role="menuitem">History</a>
+        <a href="#footer" class="nav-link" role="menuitem">Contact</a>
+      </div>
+
+      <div class="nav-right">
+        <div class="model-status" id="modelStatus" aria-live="polite">
+          <span class="status-dot"></span>
+          <span class="status-text">AI Ready</span>
+        </div>
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle mobile menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ───────────── HERO SECTION ───────────── -->
+  <section class="hero" id="hero" aria-labelledby="heroHeading">
+    <div class="hero-content">
+      <div class="hero-tag">
+        <i class="ph ph-sparkle" aria-hidden="true"></i>
+        <span>Powered by Deep Learning</span>
+      </div>
+      <h1 class="hero-title" id="heroHeading">
+        Detect Potato Leaf<br />
+        <span class="gradient-text">Diseases Instantly</span>
+      </h1>
+      <p class="hero-subtitle">
+        Upload a potato leaf image and our advanced AI model trained on thousands of samples will diagnose diseases in seconds — providing actionable treatment recommendations.
+      </p>
+      <div class="hero-stats" aria-label="Platform statistics">
+        <div class="stat-item">
+          <span class="stat-value">98.7%</span>
+          <span class="stat-label">Accuracy</span>
+        </div>
+        <div class="stat-divider" aria-hidden="true"></div>
+        <div class="stat-item">
+          <span class="stat-value">3</span>
+          <span class="stat-label">Disease Classes</span>
+        </div>
+        <div class="stat-divider" aria-hidden="true"></div>
+        <div class="stat-item">
+          <span class="stat-value">&lt;2s</span>
+          <span class="stat-label">Analysis Time</span>
+        </div>
+      </div>
+      <div class="hero-actions">
+        <a href="#upload-section" class="btn btn-primary" id="heroAnalyzeBtn">
+          <i class="ph ph-scan" aria-hidden="true"></i>
+          Start Analyzing
+        </a>
+        <a href="#about-section" class="btn btn-ghost">
+          <i class="ph ph-info" aria-hidden="true"></i>
+          Learn More
+        </a>
+      </div>
+    </div>
+    <div class="hero-visual" aria-hidden="true">
+      <div class="hero-card-float">
+        <div class="float-card card-1">
+          <i class="ph ph-check-circle"></i>
+          <span>Healthy Plant</span>
+          <strong>97.3%</strong>
+        </div>
+        <div class="float-card card-2">
+          <i class="ph ph-warning"></i>
+          <span>Early Blight</span>
+          <strong>2.2%</strong>
+        </div>
+        <div class="float-card card-3">
+          <i class="ph ph-warning-circle"></i>
+          <span>Late Blight</span>
+          <strong>0.5%</strong>
+        </div>
+        <div class="hero-ring"></div>
+        <div class="hero-leaf-icon">
+          <i class="ph ph-plant"></i>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── UPLOAD SECTION ───────────── -->
+  <section class="upload-section" id="upload-section" aria-labelledby="uploadHeading">
+    <div class="section-container">
+      <div class="section-header">
+        <div class="section-tag">
+          <i class="ph ph-upload-simple" aria-hidden="true"></i>
+          <span>Image Analysis</span>
+        </div>
+        <h2 class="section-title" id="uploadHeading">Analyze Your Leaf</h2>
+        <p class="section-subtitle">Drag &amp; drop or click to upload a clear potato leaf image for instant AI diagnosis</p>
+      </div>
+
+      <div class="upload-grid">
+        <!-- Upload Card -->
+        <div class="upload-card glass-card">
+          <form id="uploadForm" enctype="multipart/form-data" novalidate>
+            <div class="drop-zone" id="dropZone" role="button" tabindex="0"
+                 aria-label="Upload area – drag and drop image or click to browse"
+                 aria-describedby="uploadHint">
+              <div class="drop-zone-content" id="dropContent">
+                <div class="drop-icon">
+                  <i class="ph ph-image-square" aria-hidden="true"></i>
+                </div>
+                <h3 class="drop-title">Drop your leaf image here</h3>
+                <p class="drop-subtitle" id="uploadHint">or click to browse files</p>
+                <div class="drop-formats">
+                  <span>JPG</span><span>PNG</span><span>WebP</span><span>BMP</span>
+                </div>
+                <div class="drop-size-limit">Max file size: 16MB</div>
+              </div>
+
+              <!-- Preview state (hidden by default) -->
+              <div class="image-preview-container" id="previewContainer" style="display:none;" aria-live="polite">
+                <img id="imagePreview" class="preview-img" src="" alt="Uploaded leaf preview" />
+                <div class="preview-overlay">
+                  <button type="button" class="preview-change-btn" id="changeImageBtn" aria-label="Change image">
+                    <i class="ph ph-arrow-circle-up" aria-hidden="true"></i>
+                    Change Image
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <input type="file" id="fileInput" name="file"
+                   accept="image/jpeg,image/jpg,image/png,image/webp,image/bmp"
+                   style="display:none;" aria-label="File input" />
+
+            <!-- File info display -->
+            <div class="file-info" id="fileInfo" style="display:none;" aria-live="polite">
+              <div class="file-info-icon"><i class="ph ph-file-image" aria-hidden="true"></i></div>
+              <div class="file-info-text">
+                <span class="file-name" id="fileName">filename.jpg</span>
+                <span class="file-size" id="fileSize">0 KB</span>
+              </div>
+              <button type="button" class="file-remove-btn" id="removeFileBtn" aria-label="Remove selected file">
+                <i class="ph ph-x" aria-hidden="true"></i>
+              </button>
+            </div>
+
+            <!-- Error message -->
+            <div class="error-msg" id="errorMsg" role="alert" aria-live="assertive" style="display:none;">
+              <i class="ph ph-warning-circle" aria-hidden="true"></i>
+              <span id="errorText">Invalid file type.</span>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-full" id="analyzeBtn" disabled aria-disabled="true">
+              <i class="ph ph-scan" aria-hidden="true"></i>
+              <span id="analyzeBtnText">Select Image to Analyze</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Result Card (hidden initially) -->
+        <div class="result-card glass-card" id="resultCard" style="display:none;" aria-live="polite">
+          <!-- Loading state -->
+          <div class="loading-state" id="loadingState">
+            <div class="spinner-ring" aria-hidden="true">
+              <div></div><div></div><div></div><div></div>
+            </div>
+            <p class="loading-text">Analyzing leaf sample…</p>
+            <p class="loading-sub">Running AI model inference</p>
+            <div class="loading-steps" aria-hidden="true">
+              <div class="step active" id="step1">Preprocessing Image</div>
+              <div class="step" id="step2">Feature Extraction</div>
+              <div class="step" id="step3">Classification</div>
+            </div>
+          </div>
+
+          <!-- Result state (hidden until prediction) -->
+          <div class="result-state" id="resultState" style="display:none;">
+            <div class="result-header">
+              <div class="result-icon-wrap" id="resultIconWrap">
+                <span class="result-icon" id="resultIcon">🌿</span>
+              </div>
+              <div class="result-meta">
+                <span class="result-label">Diagnosis Result</span>
+                <h3 class="result-disease" id="resultDisease">Disease Name</h3>
+                <span class="result-severity severity-badge" id="resultSeverity">Severity</span>
+              </div>
+            </div>
+
+            <div class="confidence-section">
+              <div class="confidence-header">
+                <span>Confidence Score</span>
+                <strong id="confidenceValue">0%</strong>
+              </div>
+              <div class="confidence-bar-track" role="progressbar"
+                   aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"
+                   id="confidenceBar">
+                <div class="confidence-bar-fill" id="confidenceFill"></div>
+              </div>
+            </div>
+
+            <div class="all-confidences" id="allConfidences"></div>
+
+            <div class="result-description" id="resultDescription"></div>
+
+            <button class="btn btn-outline btn-full" id="viewDetailsBtn" aria-expanded="false" aria-controls="diseaseDetails">
+              <i class="ph ph-list-bullets" aria-hidden="true"></i>
+              View Full Report
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── DISEASE DETAILS SECTION ───────────── -->
+  <section class="disease-details" id="diseaseDetails" style="display:none;" aria-labelledby="detailsHeading">
+    <div class="section-container">
+      <h2 class="section-title" id="detailsHeading">
+        <i class="ph ph-clipboard-text" aria-hidden="true"></i>
+        Full Diagnostic Report
+      </h2>
+
+      <div class="details-grid">
+        <!-- Uploaded Image -->
+        <div class="detail-card glass-card image-detail-card">
+          <h3 class="detail-card-title">
+            <i class="ph ph-image" aria-hidden="true"></i> Analyzed Sample
+          </h3>
+          <div class="analyzed-image-wrap">
+            <img id="analyzedImage" src="" alt="Analyzed potato leaf" class="analyzed-image" />
+            <div class="image-overlay-badge" id="imageBadge">
+              <span id="badgeIcon">🌿</span>
+              <span id="badgeLabel">Healthy</span>
+            </div>
+          </div>
+          <div class="image-timestamp" id="imageTimestamp"></div>
+        </div>
+
+        <!-- Symptoms -->
+        <div class="detail-card glass-card">
+          <h3 class="detail-card-title">
+            <i class="ph ph-stethoscope" aria-hidden="true"></i> Symptoms Detected
+          </h3>
+          <ul class="detail-list" id="symptomsList" aria-label="Symptoms"></ul>
+        </div>
+
+        <!-- Treatment -->
+        <div class="detail-card glass-card">
+          <h3 class="detail-card-title treatment-title">
+            <i class="ph ph-first-aid-kit" aria-hidden="true"></i> Recommended Treatment
+          </h3>
+          <ul class="detail-list treatment-list" id="treatmentList" aria-label="Treatments"></ul>
+        </div>
+
+        <!-- Prevention -->
+        <div class="detail-card glass-card">
+          <h3 class="detail-card-title prevention-title">
+            <i class="ph ph-shield-check" aria-hidden="true"></i> Prevention Tips
+          </h3>
+          <ul class="detail-list prevention-list" id="preventionList" aria-label="Prevention tips"></ul>
+        </div>
+      </div>
+
+      <div class="report-actions">
+        <button class="btn btn-primary" id="analyzeAnotherBtn">
+          <i class="ph ph-arrow-counter-clockwise" aria-hidden="true"></i>
+          Analyze Another Leaf
+        </button>
+        <button class="btn btn-ghost" id="printReportBtn">
+          <i class="ph ph-printer" aria-hidden="true"></i>
+          Print Report
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── ABOUT SECTION ───────────── -->
+  <section class="about-section" id="about-section" aria-labelledby="aboutHeading">
+    <div class="section-container">
+      <div class="section-header">
+        <div class="section-tag">
+          <i class="ph ph-cpu" aria-hidden="true"></i>
+          <span>Technology</span>
+        </div>
+        <h2 class="section-title" id="aboutHeading">How It Works</h2>
+        <p class="section-subtitle">Our deep learning model analyzes leaf images using state-of-the-art computer vision</p>
+      </div>
+
+      <div class="about-cards">
+        <div class="about-card glass-card" role="article">
+          <div class="about-card-icon blue-icon">
+            <i class="ph ph-upload-simple" aria-hidden="true"></i>
+          </div>
+          <h3>Upload Image</h3>
+          <p>Capture or upload a clear photo of your potato leaf. The system accepts JPG, PNG, and WebP formats up to 16MB.</p>
+        </div>
+        <div class="about-card glass-card" role="article">
+          <div class="about-card-icon purple-icon">
+            <i class="ph ph-brain" aria-hidden="true"></i>
+          </div>
+          <h3>AI Analysis</h3>
+          <p>Our CNN model processes the image through multiple convolutional layers, extracting disease-specific features and patterns.</p>
+        </div>
+        <div class="about-card glass-card" role="article">
+          <div class="about-card-icon green-icon">
+            <i class="ph ph-chart-bar" aria-hidden="true"></i>
+          </div>
+          <h3>Instant Results</h3>
+          <p>Receive a detailed diagnosis with confidence scores, severity assessment, and comprehensive treatment recommendations.</p>
+        </div>
+        <div class="about-card glass-card" role="article">
+          <div class="about-card-icon orange-icon">
+            <i class="ph ph-leaf" aria-hidden="true"></i>
+          </div>
+          <h3>Take Action</h3>
+          <p>Follow AI-generated treatment plans and prevention strategies tailored to the specific disease detected in your crop.</p>
+        </div>
+      </div>
+
+      <!-- Disease Classes Info -->
+      <div class="disease-classes" aria-labelledby="classesHeading">
+        <h3 class="classes-heading" id="classesHeading">Detectable Conditions</h3>
+        <div class="classes-grid">
+          <div class="class-card early-blight" role="article">
+            <div class="class-icon">⚠️</div>
+            <h4>Early Blight</h4>
+            <p>Caused by <em>Alternaria solani</em>. Characterized by brown lesions with concentric ring patterns on older leaves.</p>
+            <span class="class-severity moderate">Moderate Risk</span>
+          </div>
+          <div class="class-card late-blight" role="article">
+            <div class="class-icon">🚨</div>
+            <h4>Late Blight</h4>
+            <p>Caused by <em>Phytophthora infestans</em>. Rapidly spreading water-soaked lesions that blacken and destroy foliage.</p>
+            <span class="class-severity high">High Risk</span>
+          </div>
+          <div class="class-card healthy" role="article">
+            <div class="class-icon">✅</div>
+            <h4>Healthy Plant</h4>
+            <p>No disease markers detected. Vibrant green leaves with normal structure and growth patterns throughout.</p>
+            <span class="class-severity none">No Risk</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── HISTORY SECTION ───────────── -->
+  <section class="history-section" id="history-section" aria-labelledby="historyHeading">
+    <div class="section-container">
+      <div class="section-header">
+        <div class="section-tag">
+          <i class="ph ph-clock-counter-clockwise" aria-hidden="true"></i>
+          <span>Recent Analyses</span>
+        </div>
+        <h2 class="section-title" id="historyHeading">Prediction History</h2>
+        <p class="section-subtitle">Track your recent leaf analyses and monitoring history</p>
+      </div>
+
+      <div class="history-container">
+        <div class="history-empty" id="historyEmpty">
+          <i class="ph ph-clock-counter-clockwise" aria-hidden="true"></i>
+          <p>No analyses yet. Upload your first leaf image above to get started.</p>
+        </div>
+        <div class="history-list" id="historyList" aria-label="Prediction history" role="list"></div>
+      </div>
+
+      <div class="history-actions" id="historyActions" style="display:none;">
+        <button class="btn btn-ghost btn-sm" id="clearHistoryBtn">
+          <i class="ph ph-trash" aria-hidden="true"></i>
+          Clear History
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── FOOTER ───────────── -->
+  <footer class="footer" id="footer" role="contentinfo">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <div class="nav-brand footer-brand-link" aria-label="AgriSense AI">
+          <div class="brand-icon" aria-hidden="true"><i class="ph ph-plant"></i></div>
+          <div class="brand-text">
+            <span class="brand-name">AgriSense</span>
+            <span class="brand-badge">AI</span>
+          </div>
+        </div>
+        <p class="footer-tagline">Advanced AI solutions for smarter agriculture and sustainable crop management.</p>
+        <div class="footer-socials" aria-label="Social links">
+          <a href="#" class="social-link" aria-label="GitHub"><i class="ph ph-github-logo"></i></a>
+          <a href="#" class="social-link" aria-label="Twitter"><i class="ph ph-twitter-logo"></i></a>
+          <a href="#" class="social-link" aria-label="LinkedIn"><i class="ph ph-linkedin-logo"></i></a>
+        </div>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <a href="#upload-section">Disease Detection</a>
+          <a href="#about-section">How It Works</a>
+          <a href="#history-section">History</a>
+        </div>
+        <div class="footer-col">
+          <h4>Diseases</h4>
+          <a href="#about-section">Early Blight</a>
+          <a href="#about-section">Late Blight</a>
+          <a href="#about-section">Healthy Plant</a>
+        </div>
+        <div class="footer-col">
+          <h4>Technology</h4>
+          <a href="#">TensorFlow/Keras</a>
+          <a href="#">Python Flask</a>
+          <a href="#">Docker</a>
+          <a href="#">Render Cloud</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 AgriSense AI. Built with 🌿 for farmers worldwide.</p>
+      <p class="footer-tech">TensorFlow &bull; Keras &bull; Flask &bull; Python</p>
+    </div>
+  </footer>
+
+  <!-- Main JavaScript -->
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

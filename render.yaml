@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: agrisense-potato-disease-ai
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT --workers 2 --timeout 120 app:app
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: PYTHON_VERSION
+        value: 3.10.0
+    disk:
+      name: uploads
+      mountPath: /app/static/uploads
+      sizeGB: 1
